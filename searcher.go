@@ -23,14 +23,14 @@ type Match struct {
 type Result struct {
 	WordCount   int      `json:"word_count"`
 	UniqueWords []string `json:"unique_words"`
-	AllMatches  []Match  `json:"all_matches"`
+	Matches     []Match  `json:"matches"`
 }
 
 // Filter defines criteria for filtering words
 type Filter struct {
-	MinLength   int `json:"min_length"`   // Minimum word length (inclusive)
-	MaxLength   int `json:"max_length"`   // Maximum word length (inclusive, 0 means no limit)
-	ExactLength int `json:"exact_length"` // Exact word length (0 means no exact match required)
+	MinLength   int // Minimum word length (inclusive)
+	MaxLength   int // Maximum word length (inclusive, 0 means no limit)
+	ExactLength int // Exact word length (0 means no exact match required)
 }
 
 // Searcher provides nltk English word detection with configurable filters
@@ -67,7 +67,7 @@ func (s *Searcher) Find(text string) Result {
 		return Result{
 			WordCount:   0,
 			UniqueWords: []string{},
-			AllMatches:  []Match{},
+			Matches:     []Match{},
 		}
 	}
 
@@ -100,7 +100,7 @@ func (s *Searcher) Find(text string) Result {
 	return Result{
 		WordCount:   len(matches),
 		UniqueWords: uniqueWords,
-		AllMatches:  allMatches,
+		Matches:     allMatches,
 	}
 }
 

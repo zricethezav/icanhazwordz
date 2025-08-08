@@ -24,7 +24,7 @@ func TestSearcherFindExact(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			result := searcher.Find(tt.text)
 			if result.WordCount != tt.numMatches {
-				t.Errorf("expected %d matches, got %d. Words: %v", tt.numMatches, result.WordCount, result.AllMatches)
+				t.Errorf("expected %d matches, got %d. Words: %v", tt.numMatches, result.WordCount, result.Matches)
 			}
 		})
 	}
@@ -33,7 +33,6 @@ func TestSearcherFindExact(t *testing.T) {
 func TestSearcherFindDefault(t *testing.T) {
 	// Use a simple filter for testing
 	searcher := NewSearcher(DefaultFilter)
-
 	tests := []struct {
 		name       string
 		text       string
@@ -50,7 +49,7 @@ func TestSearcherFindDefault(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			result := searcher.Find(tt.text)
 			if result.WordCount != tt.numMatches {
-				t.Errorf("expected %d matches, got %d. Words: %v", tt.numMatches, result.WordCount, result.AllMatches)
+				t.Errorf("expected %d matches, got %d. Words: %v", tt.numMatches, result.WordCount, result.Matches)
 			}
 		})
 	}
@@ -76,7 +75,7 @@ func TestSearcherFindWithFilter(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			result := searcher.Find(tt.text)
 			if result.WordCount != tt.numMatches {
-				t.Errorf("expected %d matches, got %d. Words: %v", tt.numMatches, result.WordCount, result.AllMatches)
+				t.Errorf("expected %d matches, got %d. Words: %v", tt.numMatches, result.WordCount, result.Matches)
 			}
 		})
 	}
