@@ -42,3 +42,5 @@ Shoutout to the 🐐, [github.com/BobuSumisu/aho-corasick](github.com/BobuSumisu
 
 ---
 Folks, it's MIT
+
+![a2l827](https://github.com/user-attachments/assets/6a8785d6-d34e-436a-a16b-a7be99dc7843)
