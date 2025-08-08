@@ -1,7 +1,6 @@
-package icanhazwordz
-
 // Have you ever asked yourself can i haz wordz? More specifically, does a string contain any english words?
 // This package provides functionality to detect English words in a given text using, you guessed it, our favorite friend, ahocorasick.
+package icanhazwordz
 
 import (
 	"strings"
@@ -34,7 +33,7 @@ type Filter struct {
 	ExactLength int `json:"exact_length"` // Exact word length (0 means no exact match required)
 }
 
-// Searcher provides English word detection with configurable filters
+// Searcher provides nltk English word detection with configurable filters
 type Searcher struct {
 	trie   *ahocorasick.Trie
 	words  []string
@@ -75,7 +74,6 @@ func (s *Searcher) Find(text string) Result {
 	textLower := strings.ToLower(text)
 	matches := s.trie.MatchString(textLower)
 
-	// Process matches
 	var allMatches []Match
 	uniqueWordsMap := make(map[string]bool)
 
@@ -94,7 +92,6 @@ func (s *Searcher) Find(text string) Result {
 
 	}
 
-	// Convert unique words map to slice
 	var uniqueWords []string
 	for word := range uniqueWordsMap {
 		uniqueWords = append(uniqueWords, word)
