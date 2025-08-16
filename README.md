@@ -19,6 +19,18 @@ func main() {
 	for _, m := range result.Matches {
 		fmt.Println(m.Word)
 	}
+
+    fmt.Println("---")
+    seracher.Filter =
+	searcher := icanhazwordz.NewSearcher(icanhazwordz.Filter{
+		MinLength: 3,
+		MaxLength: 4,
+        PreferLongestNonOverlapping: true,
+	})
+	result := searcher.Find("The quick brown fox jumps over the lazy dog")
+	for _, m := range result.Matches {
+		fmt.Println(m.Word)
+	}
 }
 ```
 
@@ -34,6 +46,15 @@ ump
 over
 the
 laz
+lazy
+dog
+---
+the
+brow
+fox
+jump
+over
+the
 lazy
 dog
 ```

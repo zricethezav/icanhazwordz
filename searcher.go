@@ -1,8 +1,7 @@
-// Have you ever asked yourself can i haz wordz? More specifically, does a string contain any english words?
-// This package provides functionality to detect English words in a given text using, you guessed it, our favorite friend, ahocorasick.
 package icanhazwordz
 
 import (
+	"sort"
 	"strings"
 
 	ahocorasick "github.com/BobuSumisu/aho-corasick"
@@ -10,7 +9,7 @@ import (
 
 // Default filter ignores single character words.
 // If you want to include them, set MinLength to 1.
-var DefaultFilter = Filter{MinLength: 2, MaxLength: 0}
+var DefaultFilter = Filter{MinLength: 2, MaxLength: 0, PreferLongestNonOverlapping: false}
 
 // Match represents a found word match
 type Match struct {
@@ -28,9 +27,10 @@ type Result struct {
 
 // Filter defines criteria for filtering words
 type Filter struct {
-	MinLength   int // Minimum word length (inclusive)
-	MaxLength   int // Maximum word length (inclusive, 0 means no limit)
-	ExactLength int // Exact word length (0 means no exact match required)
+	MinLength                   int  // Minimum word length (inclusive)
+	MaxLength                   int  // Maximum word length (inclusive, 0 means no limit)
+	ExactLength                 int  // Exact word length (0 means no exact match required)
+	PreferLongestNonOverlapping bool // Prefer longest non-overlapping matches. e.g. "hello" vs "hell"
 }
 
 // Searcher provides nltk English word detection with configurable filters
@@ -75,8 +75,6 @@ func (s *Searcher) Find(text string) Result {
 	matches := s.trie.MatchString(textLower)
 
 	var allMatches []Match
-	uniqueWordsMap := make(map[string]bool)
-
 	for _, match := range matches {
 		word := match.MatchString()
 		startPos := int(match.Pos())
@@ -87,9 +85,18 @@ func (s *Searcher) Find(text string) Result {
 			StartPos: startPos,
 			EndPos:   endPos,
 		})
+	}
 
-		uniqueWordsMap[word] = true
+	// Conditionally filter out overlapping matches
+	finalMatches := allMatches
+	if s.filter.PreferLongestNonOverlapping {
+		finalMatches = filterOverlappingMatches(allMatches)
+	}
 
+	// Build unique words map from final matches
+	uniqueWordsMap := make(map[string]bool)
+	for _, match := range finalMatches {
+		uniqueWordsMap[match.Word] = true
 	}
 
 	var uniqueWords []string
@@ -98,10 +105,39 @@ func (s *Searcher) Find(text string) Result {
 	}
 
 	return Result{
-		WordCount:   len(matches),
+		WordCount:   len(finalMatches),
 		UniqueWords: uniqueWords,
-		Matches:     allMatches,
+		Matches:     finalMatches,
 	}
+}
+
+// filterOverlappingMatches removes overlapping matches, keeping only the longest non-overlapping ones
+func filterOverlappingMatches(matches []Match) []Match {
+	if len(matches) == 0 {
+		return matches
+	}
+
+	// Sort matches by start position, then by length (longest first for same start position)
+	sort.Slice(matches, func(i, j int) bool {
+		if matches[i].StartPos == matches[j].StartPos {
+			return len(matches[i].Word) > len(matches[j].Word) // Longer words first
+		}
+		return matches[i].StartPos < matches[j].StartPos
+	})
+
+	var result []Match
+	lastEndPos := -1
+
+	for _, match := range matches {
+		// If this match doesn't overlap with the last accepted match
+		if match.StartPos >= lastEndPos {
+			result = append(result, match)
+			lastEndPos = match.EndPos
+		}
+		// If it overlaps, we skip it (since we sorted by length, the previous one was longer)
+	}
+
+	return result
 }
 
 // getFilteredWords returns words filtered by the given criteria

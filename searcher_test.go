@@ -56,7 +56,8 @@ func TestSearcherFindDefault(t *testing.T) {
 }
 
 func TestSearcherFindWithFilter(t *testing.T) {
-	filter := Filter{MinLength: 3, MaxLength: 4}
+	// should only match "hell" in "hello world"
+	filter := Filter{MinLength: 3, MaxLength: 4, PreferLongestNonOverlapping: true}
 	searcher := NewSearcher(filter)
 
 	tests := []struct {
@@ -66,8 +67,8 @@ func TestSearcherFindWithFilter(t *testing.T) {
 	}{
 		{
 			name:       "test min and max",
-			text:       "hello world",
-			numMatches: 2,
+			text:       "The quick brown fox jumps over the lazy dog",
+			numMatches: 8,
 		},
 	}
 
